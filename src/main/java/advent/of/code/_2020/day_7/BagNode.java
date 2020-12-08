@@ -1,17 +1,16 @@
 package advent.of.code._2020.day_7;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public class BagNode {
-    private String color;
     private Set<BagNode> parents;
-    private Set<BagNode> children;
+    private HashMap<BagNode, Integer> children;
 
-    public BagNode(String color) {
-        this.color = color;
+    public BagNode() {
         parents = new HashSet<>();
-        children = new HashSet<>();
+        children = new HashMap<>();
     }
 
     public void addParent(BagNode parent) {
@@ -22,9 +21,13 @@ public class BagNode {
         return parents;
     }
 
-    public void addChildren(BagNode child) {
+    public HashMap<BagNode, Integer> getChildren() {
+        return children;
+    }
+
+    public void addChildren(BagNode child, int number) {
         child.addParent(this);
-        children.add(child);
+        children.put(child, number);
     }
 
     public Set<BagNode> retrieveAncestors() {
@@ -38,6 +41,22 @@ public class BagNode {
         for (BagNode node : parents) {
             res.add(node);
             retrieveAncestors(node.getParents(), res);
+        }
+        return res;
+    }
+
+    public int retrieveChildren() {
+        return retrieveChildren(getChildren()) - 1;
+    }
+
+    public int retrieveChildren(HashMap<BagNode, Integer> children) {
+        if (children.isEmpty()) {
+            return 1;
+        }
+        int res = 1;
+        for (BagNode node : children.keySet()) {
+            int numberOfBags = children.get(node);
+            res += numberOfBags * retrieveChildren(node.getChildren());
         }
         return res;
     }

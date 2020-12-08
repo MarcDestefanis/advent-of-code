@@ -15,11 +15,17 @@ public class Solution {
         return ancestors.size();
     }
 
+    public int solvePart2(List<String> inputs) {
+        HashMap<String, BagNode> parents = buildParents(inputs);
+        HashMap<String, BagNode> familyTree = buildFamilyTree(inputs, parents);
+        return familyTree.get("shiny gold").retrieveChildren();
+    }
+
     private HashMap<String, BagNode> buildParents(List<String> inputs) {
         HashMap<String, BagNode> parents = new HashMap<>();
         for (String rule : inputs) {
             final String parent = findParent(rule);
-            BagNode node = new BagNode(parent);
+            BagNode node = new BagNode();
             parents.put(parent, node);
         }
         return parents;
@@ -28,11 +34,13 @@ public class Solution {
     private HashMap<String, BagNode> buildFamilyTree(List<String> inputs, HashMap<String, BagNode> parents) {
         for (String rule : inputs) {
             final String parentColor = findParent(rule);
-            final List<String> childrenColor = findChildren(rule);
+            final List<String> children = findChildren(rule);
             final BagNode parent = parents.get(parentColor);
-            for (String childColor : childrenColor) {
-                final BagNode child = parents.get(childColor);
-                parent.addChildren(child);
+            for (String childData : children) {
+                int number = Integer.parseInt(childData.substring(0, 1));
+                String color = childData.substring(2);
+                final BagNode child = parents.get(color);
+                parent.addChildren(child, number);
             }
         }
         return parents;
@@ -51,13 +59,8 @@ public class Solution {
         final Matcher matcher = pattern.matcher(rule);
         while (matcher.find()) {
             String child = matcher.group("child");
-            child = child.substring(2); // Remove the number of bags
             children.add(child);
         }
         return children;
-    }
-
-    public int solvePart2(List<String> inputs) {
-        return 0;
     }
 }
